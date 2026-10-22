@@ -24,7 +24,8 @@ static void usage(FILE *out, const char *prog)
             "Options:\n"
             "  -a, --batch-file FILE  File to read URLs from (required);\n"
             "                         created if it does not exist\n"
-            "  -h, --help             Show this help and exit\n",
+            "  -h, --help             Show this help and exit\n"
+            "  -v, --version          Show version and exit\n",
             prog, prog);
 }
 
@@ -154,16 +155,20 @@ int main(int argc, char *argv[])
     static const struct option long_opts[] = {
         {"batch-file", required_argument, NULL, 'a'},
         {"help", no_argument, NULL, 'h'},
+        {"version", no_argument, NULL, 'v'},
         {NULL, 0, NULL, 0},
     };
     const char *batch_file = NULL;
     int opt;
 
-    while ((opt = getopt_long(argc, argv, "a:h", long_opts, NULL)) != -1) {
+    while ((opt = getopt_long(argc, argv, "a:hv", long_opts, NULL)) != -1) {
         switch (opt) {
         case 'a':
             batch_file = optarg;
             break;
+        case 'v':
+            printf("%s %s\n", PROGRAM_NAME, PROGRAM_VERSION);
+            return 0;
         case 'h':
             usage(stdout, argv[0]);
             return 0;
