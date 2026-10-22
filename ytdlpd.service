@@ -1,0 +1,22 @@
+[Unit]
+Description=yt-dlpd Service
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=exec
+
+# Change joe to your username, use whoami to find out
+User=joe
+Group=joe
+
+Environment="HOME=/home/joe"
+WorkingDirectory=/home/joe
+
+# Change yt-dlpd full path and monitoring file path
+ExecStart=/home/joe/bin/yt-dlpd -a /home/joe/yt/urls.txt
+
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target

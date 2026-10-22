@@ -128,6 +128,50 @@ yt-dlpd --batch-file urls.txt
 
 Exit codes: `0` on normal exit, `1` if the batch file cannot be opened/created or monitoring fails, `2` on invalid or missing arguments.
 
+## Run as a systemd service
+
+The repository ships a unit file, [ytdlpd.service](ytdlpd.service), to run `yt-dlpd` in the background.
+
+1. Install the binary somewhere stable, e.g. `cp build/yt-dlpd ~/bin/` (or `meson install -C build`).
+
+2. Edit `ytdlpd.service` before installing it. **These values must be changed for your system:**
+
+   - `User=` / `Group=`: change `joe` to your username (run `whoami` to find out). Also update `Environment="HOME=..."` and `WorkingDirectory=` to your home directory.
+   - `ExecStart=`: change it to the **full path** of the `yt-dlpd` binary and the **full path** of the file to monitor:
+
+     ```ini
+     ExecStart=/home/youruser/bin/yt-dlpd -a /home/youruser/yt/urls.txt
+     ```
+
+3. Install and start it:
+
+   ```sh
+   sudo cp ytdlpd.service /etc/systemd/system/
+   sudo systemctl daemon-reload
+   sudo systemctl enable --now ytdlpd
+   ```
+
+4. Manage and inspect it:
+
+   ```sh
+   systemctl status ytdlpd      # Current state
+   journalctl -u ytdlpd -f      # Follow the logs
+   sudo systemctl restart ytdlpd
+   sudo systemctl disable --now ytdlpd
+   ```
+
+Notes:
+
+- The directory containing the monitored file must already exist and be writable by `User`; the file itself is created if missing.
+- `yt-dlp` must be in the service's `PATH` (systemd's default, e.g. `/usr/bin`). Locations such as `~/.local/bin` are not included.
+- If you get a "cannot execute yt-dlp" / command-not-found error, add the directory containing `yt-dlp` (find it with `which yt-dlp`) to `PATH` in the `[Service]` section of `ytdlpd.service`:
+
+  ```ini
+  Environment="PATH=/home/youruser/.local/bin:/usr/local/bin:/usr/bin:/bin"
+  ```
+- yt-dlp reads its config (`~/.config/yt-dlp/config`) from the `HOME` set in the unit.
+- After editing the unit file, run `sudo systemctl daemon-reload` and `sudo systemctl restart ytdlpd`.
+
 ## License
 
 This project is licensed under the GNU General Public License v3.0. See [LICENSE](LICENSE) for details.
