@@ -195,5 +195,5 @@ int main(int argc, char *argv[])
     printf("[%s] Monitoring %s\n", PROGRAM_NAME, batch_file);
     fflush(stdout);
 
-    return monitor_file(batch_file) == 0 ? 0 : 1;
+    return monitor_file(batch_file);
 }

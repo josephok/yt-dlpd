@@ -126,8 +126,6 @@ yt-dlpd --batch-file urls.txt
 
 `yt-dlp` must be installed and available in `PATH`. To avoid duplicated download, make sure your yt-dlp config(`~/.config/yt-dlp/config`) has following config: `--download-archive ~/archive.txt`
 
-Exit codes: `0` on normal exit, `1` if the batch file cannot be opened/created or monitoring fails, `2` on invalid or missing arguments.
-
 ## Run as a systemd service
 
 The repository ships a unit file, [ytdlpd.service](ytdlpd.service), to run `yt-dlpd` in the background.
