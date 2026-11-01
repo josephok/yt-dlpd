@@ -126,6 +126,8 @@ yt-dlpd --batch-file urls.txt
 
 `yt-dlp` must be installed and available in `PATH`. To avoid duplicated download, make sure your yt-dlp config(`~/.config/yt-dlp/config`) has following config: `--download-archive ~/archive.txt`
 
+Only one instance can run at a time per user, enforced with `flock` on `$XDG_RUNTIME_DIR/yt-dlpd.lock` (or `/tmp/yt-dlpd-<uid>.lock` if `XDG_RUNTIME_DIR` is not set, e.g. under a systemd system service). A second instance prints an error and exits with status `1`. The lock is released automatically when the process exits.
+
 ## Run as a systemd service
 
 The repository ships a unit file, [ytdlpd.service](ytdlpd.service), to run `yt-dlpd` in the background.

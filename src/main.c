@@ -1,8 +1,11 @@
 #include <errno.h>
 #include <getopt.h>
 #include <signal.h>
+#include <fcntl.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
+#include <sys/file.h>
 #include <sys/inotify.h>
 #include <sys/wait.h>
 #include <unistd.h>
@@ -38,6 +41,38 @@ static int ensure_file(const char *path)
         return -1;
     }
     fclose(fp);
+    return 0;
+}
+
+/*
+ * Take an exclusive per-user lock so only one instance runs. The descriptor is
+ * intentionally kept open (close-on-exec) for the process lifetime; the kernel
+ * releases the lock when we exit, even after a crash.
+ */
+static int acquire_lock(void)
+{
+    char path[256];
+    const char *dir = getenv("XDG_RUNTIME_DIR");
+
+    if (dir != NULL && dir[0] == '/')
+        snprintf(path, sizeof path, "%s/%s.lock", dir, PROGRAM_NAME);
+    else
+        snprintf(path, sizeof path, "/tmp/%s-%lu.lock", PROGRAM_NAME, (unsigned long)getuid());
+
+    int fd = open(path, O_RDWR | O_CREAT | O_CLOEXEC, 0600);
+    if (fd < 0) {
+        fprintf(stderr, "[%s] cannot open lock file '%s': %s\n", PROGRAM_NAME, path, strerror(errno));
+        return -1;
+    }
+
+    if (flock(fd, LOCK_EX | LOCK_NB) < 0) {
+        if (errno == EWOULDBLOCK)
+            fprintf(stderr, "[%s] another instance is already running (lock: %s)\n", PROGRAM_NAME, path);
+        else
+            fprintf(stderr, "[%s] cannot lock '%s': %s\n", PROGRAM_NAME, path, strerror(errno));
+        close(fd);
+        return -1;
+    }
     return 0;
 }
 
@@ -183,6 +218,9 @@ int main(int argc, char *argv[])
         usage(stderr, argv[0]);
         return 2;
     }
+
+    if (acquire_lock() != 0)
+        return 1;
 
     if (ensure_file(batch_file) != 0)
         return 1;
