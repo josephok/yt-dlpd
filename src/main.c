@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: 2026 Joseph Wu <wuyonggao@gmail.com>
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 #include <errno.h>
 #include <getopt.h>
 #include <signal.h>
