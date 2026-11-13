@@ -1,7 +1,7 @@
 project('yt-dlpd', 'c',
   version : '0.1.0',
   license : 'GPL-3.0-or-later',
-  default_options : ['c_std=gnu17', 'warning_level=3'])
+  default_options : ['c_std=gnu17', 'warning_level=3', 'buildtype=debugoptimized', 'b_pie=true'])
 
 add_project_arguments(
   '-DPROGRAM_NAME="@0@"'.format(meson.project_name()),

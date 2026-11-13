@@ -57,39 +57,6 @@ Run the following from the project root:
 
 The resulting binary is `build/yt-dlpd`.
 
-## Common options
-
-Release (optimized) build:
-
-```sh
-meson setup build-release --buildtype=release
-meson compile -C build-release
-```
-
-Optimized build with debug info:
-
-```sh
-meson setup build-relwithdebinfo --buildtype=debugoptimized
-```
-
-Debug build (the default; can be set explicitly):
-
-```sh
-meson setup build --buildtype=debug
-```
-
-Change the configuration of an existing build directory:
-
-```sh
-meson configure build -Dbuildtype=release
-```
-
-Choose a compiler:
-
-```sh
-CC=clang meson setup build-clang
-```
-
 ## Install
 
 ```sh
